@@ -1,0 +1,43 @@
+<% if flash[:notice] %>
+<div class = "alert alert-success alert-dismissible"  role="alert" style="margin-top:10px">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" style="top:-13px"><span aria-hidden="true">&times;</span></button>
+<h3><%= flash[:notice] %></h3>
+</div>
+<% end %>
+<p>
+  <strong>User name:</strong>
+  <%= @user.user_name %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= @user.email %>
+</p>
+
+<p>
+  <strong>Phone:</strong>
+  <%= @user.phone %>
+</p>
+
+<p>
+  <strong>Address:</strong>
+  <% l = Location.find_by user_id: @user.id %>
+  <% if !l.nil? %>
+  <%= l.address%>
+  <%end%>
+</p>
+
+<p>
+  <strong>Reliability:</strong>
+  <%count1 = Offer.find(:all, :conditions => { :user1_id => @user.id, :accepted => true})%>
+  <%count2 = Offer.find(:all, :conditions => { :user2_id => @user.id, :accepted => true})%>
+  <%= count1.length + count2.length %>
+</p>
+
+<p>
+  <strong>Looking for:</strong>
+  <%= (@user.looking_for[0..-2].map {|i| Category.find(i.to_i).name}).map {|s| s[0..-1]}.join(", ") %>
+</p>
+
+<%= link_to 'Edit', edit_user_path(@user) %> |
+<%= link_to 'Back', users_path %>

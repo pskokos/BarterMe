@@ -1,0 +1,9 @@
+<% if flash[:notice] %>
+<div class = "alert alert-danger alert-dismissible"  role="alert" style="margin-top:10px">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" style="top:-13px"><span aria-hidden="true">&times;</span></button>
+<h3><%= flash[:notice] %></h3>
+</div>
+<% end %>
+
+
+<%= render :partial => 'new_offer_form'%>

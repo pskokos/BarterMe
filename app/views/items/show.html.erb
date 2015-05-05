@@ -1,0 +1,62 @@
+
+<style>
+h3 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+</style>
+
+
+<% if flash[:notice] %>
+<div class = "alert alert-success alert-dismissible"  role="alert" style="margin-top:10px">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" style="top:-13px"><span aria-hidden="true">&times;</span></button>
+<h3><%= flash[:notice] %></h3>
+</div>
+<% end %>
+
+<div class="row">
+  <div class="col-md-5" style="padding-top:10px">
+    <% if @item.image_url.present? %>
+            <%= image_tag @item.image_url, :size => "400x400" %>
+            <% else %>
+            <%= image_tag "http://placehold.it/400&text="+@item.name %>
+            <% end %>
+    <div class="row">
+      <div class="col-md-5">
+	<% if logged_in? && @item.user_id != @current_user.id %>
+	<%= button_to 'Add to Watchlist', line_items_path(item_id: @item), class: 'btn btn-primary btn-md btn-block' %>
+	<% end %>
+	
+	<% if logged_in? && @item.user_id == @current_user.id %>
+	<%= button_to 'Edit', edit_item_path(@item), class: 'btn btn-primary btn-md btn-block'  %>
+	<% end %>
+      </div>
+	<div class="col-md-5">
+	     <%= link_to 'Back', items_path, class: 'btn btn-primary btn-md btn-block' %>
+	</div>
+    </div>
+  </div>
+<div class="col-md-6">
+   <div class="jumbotron" style="margin-top: 10px; padding-top:10px">
+     <div class="row" style="padding-bottom:5px">
+       <div style="font-size:35px"><b>Owner:</b></div>
+       <div style="font-size:20px; padding-top:5px"><a href=<%= "/profile/#{@item.user.id}" %>> <%= "#{@item.user.user_name}" %></a></div>
+     </div>
+      <div class="row">
+      <div style="font-size:35px"><b>Description:</b></div>
+      <div style="font-size:20px"><%= @item.description %></div>
+    </div>
+    <div class="row">
+	<div style="font-size:35px"><b>Category:</b></div>
+	<div style="font-size:20px"><%= Category.find(@item.category_id).name%></div>
+    </div>
+    <div class="row">
+	<div style="font-size:35px"><b>Location:</b></div>
+	<div style="font-size:20px"><%= @item.location %></div>
+    </div>
+    <div class="row">
+      <div style="font-size:35px"><b>Quantity:</b></div>
+      <div style="font-size:20px"><%= @item.quantity %></div>
+    </div>
+  </div>
+</div>

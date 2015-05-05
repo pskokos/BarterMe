@@ -1,0 +1,75 @@
+<style>
+h3 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+</style>
+
+
+<% if flash[:notice] %>
+<div class = "alert alert-success alert-dismissible"  role="alert" style="margin-top:10px">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" style="top:-13px"><span aria-hidden="true">&times;</span></button>
+<h3><%= flash[:notice] %></h3>
+</div>
+<% end %>
+
+<%= render :partial => 'detail', :locals => {:offer => @offer} %>
+
+<% if @offer.accepted? %>
+
+<% other_user = User.find(@offer.user1_id + @offer.user2_id - @current_user.id) %>
+<p>
+  <h4><%= other_user.user_name + " rated you:" %></h4>
+  <% ry = Rating.find_by(offer_id: params[:id], user_id: @current_user.id)%>
+  <%= image_tag ry.score.to_i.to_s + '_star.png', :size => "150x30"  %>
+</p>
+
+<p>
+  <h4><%= "You rated " + other_user.user_name + ":"%></h4>
+  <% ro = Rating.find_by(offer_id: params[:id], user_id: other_user.id)%> 
+  <%= image_tag ro.score.to_i.to_s + '_star.png', :size => "150x30"  %>
+</p>
+
+
+<div class="row">
+  <div class="col-md-10" style="padding-top:10px; border-bottom: 1px solid #ccc">
+    <%= render :partial => 'ratings/form', :locals => {:offer => @offer}  %>
+  </div>
+</div>
+
+<% end %>
+
+
+
+<div class="row">
+  <div class="col-md-10" style="padding-top:10px; border-bottom: 1px solid #ccc">
+   <table class="table table-striped">
+    <thead>
+    </thead>
+    <% @offer.comments.each do |c| %>
+    <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+     <td class="col-md-2">
+       <%= c.from %>
+       <%= "said:" %>
+     </td>
+     <td>
+      <%= c.message %>
+    </td>
+    <td class="col-md-6">
+      <td>
+        <%= c.created_at.to_s.delete("UTC") %>
+      </td>
+    </td>
+  </tr>
+  <% end %>
+</table>
+
+<%= render :partial => 'comments/form', :params => @offer %>
+
+
+</div>
+</div>
+
+
+<%= link_to 'Edit', edit_offer_path(@offer) %> |
+<%= link_to 'Back', offers_path %>

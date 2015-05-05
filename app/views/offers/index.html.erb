@@ -1,0 +1,103 @@
+<style>
+h3 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+</style>
+
+
+<% if flash[:notice] %>
+<div class = "alert alert-success alert-dismissible"  role="alert" style="margin-top:10px">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close" style="top:-13px"><span aria-hidden="true">&times;</span></button>
+<h3><%= flash[:notice] %></h3>
+</div>
+<% end %>
+
+
+<h1>Offers Made To Me and By Me</h1>
+
+Filter offer by status: 
+<%= form_tag offers_path, method: 'get' do %>
+<%= select_tag 'pending', options_for_select({"all" => "all", "Pending" => true, "Responded" => false},"all") %>
+<%= submit_tag 'Filter', class: 'btn btn-primary btn-md' %>
+<% end %>
+
+<div class="row">
+  <div class="col-md-10" style="padding-top:10px; border-bottom: 1px solid #ccc">
+    <table class="table table-striped">
+      <thead>
+         <th>Proposee</th>
+         <th>Proposer</th>
+         <th>Items desired</th>
+         <th>Items offered</th>
+         <th>Status</th>
+         <th>You rated this barter:</th>
+     </thead>
+     <tbody>
+      <% @offers.each do |offer| %>
+        <% item1_ids = offer.item1_id.split(",") %>
+        <% item2_ids = offer.item2_id.split(",") %>
+        <% user1 = User.find(offer.user1_id) %>
+        <% user2 = User.find(offer.user2_id) %>
+        <% item1 = Item.find(item1_ids) %>
+        <% item2 = Item.find(item2_ids) %>
+        <tr>
+
+          <td><b><%= link_to user1.user_name, "/profile/#{user1.id}"%></td>
+          <td><b><%= link_to user2.user_name, "/profile/#{user2.id}"%></td>
+          <%count = 0%>
+          <td><% item1.each do |i|%>
+              <b><%= link_to i.name, "items/#{i.id}"%>
+              <%if count < item1.length - 1%> 
+              <%=", "%>
+              <%end%> 
+              <%end%></td>
+          <%count = 0%>
+          <td><% item2.each do |i|%>
+            <b><%= link_to i.name, "items/#{i.id}"%>
+            <%if count < item2.length - 1%> 
+              <%=", "%>
+              <%end%> 
+              <%end%></td>
+
+          <% if offer.pending %>
+            <td><h4><span class="label label-default label-lg">Pending</span></h4></td>
+          <% else%>
+            <% if offer.accepted %>
+              <td><h4><span class="label label-success label-lg">Accepted</span></h4></td>
+            <% else %>
+              <td><h4><span class="label label-danger label-lg">Rejected</span></h4></td>
+            <% end %>
+          <% end %>
+
+          <% r = Rating.find_by(offer_id: offer.id, user_id: offer.user1_id + offer.user2_id - @current_user.id)%>
+          <td>
+            <% if offer.accepted? %>
+            <%= image_tag  r.score.to_i.to_s + '_star.png', :size => "120x24"  %></td>
+            <% else %>
+            <%= "Rating available after" %></br>
+            <%= "the barter is accepted."%>
+            <% end %>
+          <td>
+            <%= link_to 'View offer', offer_path(offer), class: 'btn btn-primary btn-md btn-block'%>
+            <% if offer.pending %>
+              <% if offer.user1_id == @current_user.id%>
+                <%= link_to 'Accept', accept_offer_path(offer),
+                data: { confirm: 'Are you sure?' }, class: 'btn btn-primary btn-md btn-block' %>
+                <%= link_to 'Reject', reject_offer_path(offer),
+                data: { confirm: 'Are you sure?' }, class: 'btn btn-primary btn-md btn-block' %> 
+              <% else %>
+                <%= link_to 'Retract', offer, method: :delete,
+                data: { confirm: 'Are you sure?' }, class: 'btn btn-primary btn-md btn-block' %> 
+              <% end %>
+            <% end %>
+            <%= link_to 'Comment', new_offer_comment_path(offer), class: 'btn btn-primary btn-md btn-block' %> 
+          </td>
+
+
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <br>
+
